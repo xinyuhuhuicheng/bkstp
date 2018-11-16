@@ -1,50 +1,65 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+{% extends 'base.html' %}
 {% load staticfiles %}
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>尚硅谷书城-商品详情</title>
-	<link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
+{% block title %}尚硅书店谷-首页{% endblock %}
+{% block topfiles %}
+<script>
+// 增减商品并且自动更新总价
+$(function() {
+    update_total_price()
+    function update_total_price() {
+        // 商品的价格和数量
+        books_price = $('.show_prize').children('em').text()
+        books_count = $('.num_show').val()
+        // 商品的总价
+        books_price = parseFloat(books_price)
+        books_count = parseInt(books_count)
+        total_price = books_price * books_count
+        $('.total').children('em').text(total_price.toFixed(2) + '元')
+}
+    // 商品增加
+    $('.add').click(function () {
+        // 获取商品的数量
+        books_count = $('.num_show').val()
+        // 加1
+        books_count = parseInt(books_count) + 1
+        // 重新设置值
+        $('.num_show').val(books_count)
+        // 计算总价
+        update_total_price()
+    })
 
-</head>
-<body>
-	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到尚硅谷!</div>
-			<div class="fr">
-				<div class="login_info fl">
-					欢迎您：<em>张 山</em>
-				</div>
-				<div class="login_btn fl">
-					<a href="login.html">登录</a>
-					<span>|</span>
-					<a href="register.html">注册</a>
-				</div>
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
-					<span>|</span>
-					<a href="cart.html">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>		
-	</div>
+    // 商品减少
+    $('.minus').click(function () {
+        // 获取商品的数量
+        books_count = $('.num_show').val()
+        // 加1
+        books_count = parseInt(books_count) - 1
+        if (books_count == 0){
+            books_count = 1
+        }
+        // 重新设置值
+        $('.num_show').val(books_count)
+        // 计算总价
+        update_total_price()
+    })
 
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="images/logo.png" style="width: 160px; height: 53px;"></a>
-		<div class="search_con fl">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>
-		<div class="guest_cart fr">
-			<a href="cart.html" class="cart_name fl">我的购物车</a>
-			<div class="book_count fl" id="show_count">1</div>
-		</div>
-	</div>
-
+    // 手动输入
+    $('.num_show').blur(function () {
+        // 获取商品的数量
+        books_count = $(this).val()
+        // 数据校验
+        if (isNaN(books_count) || books_count.trim().length == 0 || parseInt(books_count) <= 0 ){
+            books_count = 1
+        }
+        // 重新设置值
+        $('.num_show').val(parseInt(books_count))
+        // 计算总价
+        update_total_price()
+    })
+})
+</script>
+{% endblock topfiles %}
+{% block body %}
 	<div class="navbar_con">
 		<div class="navbar clearfix">
 			<div class="subnav_con fl">
@@ -95,10 +110,11 @@
 					<a href="javascript:;" class="minus fr">-</a>	
 				</div> 
 			</div>
-			<div class="total">总价：<em>100元</em></div>
+			<div class="total">总价：<em></em></div>
 			<div class="operate_btn">
+                {% csrf_token %}
 				<a href="javascript:;" class="buy_btn">立即购买</a>
-				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>				
+				<a href="javascript:;" books_id="{{ books.id }}" class="add_cart" id="add_cart">加入购物车</a>				
 			</div>
 		</div>
 	</div>
@@ -128,31 +144,35 @@
 			<div class="tab_content">
 				<dl>
 					<dt>商品详情：</dt>
-					<dd>《计算机程序设计艺术》系列是公认的计算机科学领域经典之作，深入阐述了程序设计理论，对计算机领域的发展有着极为深远的影响。本书是该系列的第 1 卷，讲解基本算法，其中包含了其他各卷都需用到的基本内容。本卷从基本概念开始，然后讲述信息结构，并辅以大量的习题及答案。 </dd>
+					<dd>{{ books.detail | safe }} </dd>
 				</dl>
 			</div>
 
 		</div>
 	</div>
+    <div class="add_jump"></div>
+<script type="text/javascript">
+$(function(){
+    $('#add_cart').click(function(){
+        var books_id = $(this).attr('books_id');
+        var books_count = $('.num_show').val();
+        var csrf = $('input[name="csrfmiddlewaretoken"]').val();
+        var params = {
+            'books_id': books_id,
+            'books_count': books_count,
+            'csrfmiddlewaretoken': csrf
+        }
+        $.post('/cart/add/', params, function (data) {
+            if (data.res == 5){
+                var count = $('#show_count').html();
+                var count = parseInt(count) + parseInt(books_count);
+                $('#show_count').html(count);
+            } else {
+                alert(data.errmsg)
+            }
+        })
+    })
+})
+</script>
+{% endblock body %}
 
-	<div class="footer">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>		
-		</div>
-		<p>CopyRight © 2016 北京尚硅谷信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
-	<div class="add_jump"></div>
-
-	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
-	<script type="text/javascript">
-	</script>
-	
-</body>
-</html>

@@ -20,5 +20,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^user/', include('users.urls', namespace='user')),
     url(r'^tinymce/', include('tinymce.urls')),
+    url(r'^order/', include('order.urls', namespace='order')), 
+    url(r'^cart/', include('cart.urls', namespace='cart')),
     url(r'^', include('books.urls', namespace='books')), 
 ]

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users',
     'books',
     'tinymce',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,18 @@ DATABASES = {
         'PASSWORD': 'abc123',
         'PORT': 3306,
         'HOST': 'localhost',
+    }
+}
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": ""
+        }
     }
 }
 
@@ -137,3 +150,7 @@ TINYMCE_DEFAULT_CONFIG = {
     'width': 600,
     'height': 400,
 }
+
+#redis缓存
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
