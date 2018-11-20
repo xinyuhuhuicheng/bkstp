@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'books',
     'tinymce',
     'order',
+    'haystack',
 ]
 
 MIDDLEWARE = [
@@ -154,3 +155,36 @@ TINYMCE_DEFAULT_CONFIG = {
 #redis缓存
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+
+#Alipay
+ALIPAY_URL='https://openapi.alipaydev.com/gateway.do'
+
+# 邮箱验证
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'
+# 126和163邮箱的SMTP端口为25； QQ邮箱使用的SMTP端口为465
+EMAIL_PORT = 25
+# 如果使用QQ邮箱发送邮件，需要开启SSL加密, 如果在aliyun上部署，也需要开启ssl加密，同时修改端口为EMAIL_PORT = 465
+# EMAIL_USE_SSL = True
+# 发送邮件的邮箱
+EMAIL_HOST_USER = 'ly03171629@163.com'
+# 在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'liuyuan1987729'
+# 收件人看到的发件人
+EMAIL_FROM = 'ly03171629@163.com'
+
+# 全文检索配置
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 使用whoosh引擎
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        # 'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        # 索引文件路径
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6 # 指定搜索结果每页的条数

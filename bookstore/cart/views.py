@@ -99,8 +99,8 @@ def cart_del(request):
 
 @login_required
 def cart_update(request):
-    books_id = request.POST.get('books_id')
-    books_count = request.POST.get('books_count')
+    books_id = request.POST.get('books_id', '')
+    books_count = request.POST.get('books_count', '')
 
     if not all([books_id, books_count]):
         return JsonResponse({'res': 1, 'errmsg': '数据不完整'})

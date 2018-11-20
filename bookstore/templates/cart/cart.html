@@ -108,9 +108,9 @@
         function update_cart_count() {
             $.get('/cart/count/', function (data) {
                 $('.total_count').children('em').text(data.res)
-            })
                 $('#show_count').html(data.res)
             })
+        }
 
         // 购物车商品数目的增加
         $('.add').click(function () {
